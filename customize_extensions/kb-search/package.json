@@ -32,7 +32,6 @@
         }
       ]
     },
-    
     {
       "name": "instance",
       "type": "textfield",
