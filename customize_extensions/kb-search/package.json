@@ -37,7 +37,7 @@
       "type": "textfield",
       "required": true,
       "title": "域名",
-      "description": "访问域名",
+      "description": "KB系统内网访问域名",
       "default": "kb.cvte.com",
       "placeholder": "KB内网访问域名"
     },
@@ -61,6 +61,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.27.0",
+    "build": "^0.1.4",
     "node-fetch": "^3.0.0",
     "prettier": "^2.5.1",
     "publish": "^0.6.0",

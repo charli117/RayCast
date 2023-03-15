@@ -13,18 +13,27 @@ import fetch, { AbortError, RequestInit, Response } from "node-fetch";
 import { useCallback, useEffect, useRef, useState } from "react";
 import https = require("https");
 
-const prefs: { instanceType: string; user: string; instance: string; unsafeHttps: boolean; token: string } =
-  getPreferenceValues();
+const prefs: {
+  instanceType: string;
+  user: string;
+  instance: string;
+  unsafeHttps: boolean;
+  token: string;
+} = getPreferenceValues();
 export const confluenceUrl =
-  prefs.instanceType == "cloud" ? `https://${prefs.instance}/wiki` : `https://${prefs.instance}`;
+  prefs.instanceType == "cloud"
+    ? `https://${prefs.instance}/wiki`
+    : `https://${prefs.instance}`;
 
-const missingPrefs = prefs.instanceType == "cloud" ? !prefs.user || !prefs.token : !prefs.token;
+const missingPrefs =
+  prefs.instanceType == "cloud" ? !prefs.user || !prefs.token : !prefs.token;
 
 const headers = {
   Accept: "application/json",
   Authorization:
     prefs.instanceType == "cloud"
-      ? "Basic " + Buffer.from(`${prefs.user}:${prefs.token}`).toString("base64")
+      ? "Basic " +
+        Buffer.from(`${prefs.user}:${prefs.token}`).toString("base64")
       : `Bearer ${prefs.token}`,
 };
 
@@ -47,7 +56,10 @@ function renderPreferences() {
       markdown={markdown}
       actions={
         <ActionPanel>
-          <Action title="Open Extension Preferences" onAction={openExtensionPreferences} />
+          <Action
+            title="Open Extension Preferences"
+            onAction={openExtensionPreferences}
+          />
         </ActionPanel>
       }
     />
@@ -76,7 +88,9 @@ export default function Command() {
     >
       <List.Section title="Results">
         {results.length > 0 &&
-          results.map((searchResult) => <SearchListItem key={searchResult.id} searchResult={searchResult} />)}
+          results.map((searchResult) => (
+            <SearchListItem key={searchResult.id} searchResult={searchResult} />
+          ))}
       </List.Section>
     </List>
   );
@@ -93,13 +107,21 @@ function useSearch() {
       cancelRef.current = new AbortController();
       setIsLoading(true);
       try {
-        const response = await searchConfluence(searchText, _type, cancelRef.current.signal);
+        const response = await searchConfluence(
+          searchText,
+          _type,
+          cancelRef.current.signal
+        );
         setResults(response);
       } catch (error) {
         if (error instanceof AbortError) {
           return;
         }
-        showToast(Toast.Style.Failure, "Could not perform search", String(error));
+        showToast(
+          Toast.Style.Failure,
+          "Could not perform search",
+          String(error)
+        );
       } finally {
         setIsLoading(false);
       }
@@ -117,14 +139,18 @@ function useSearch() {
   return [results, isLoading, search] as const;
 }
 
-async function searchConfluence(searchText: string, _type: string, signal: AbortSignal) {
+async function searchConfluence(
+  searchText: string,
+  _type: string,
+  signal: AbortSignal
+) {
   const httpsAgent = new https.Agent({
     rejectUnauthorized: !prefs.unsafeHttps,
   });
   const init: RequestInit = {
     headers,
     method: "get",
-    agent: httpsAgent
+    agent: httpsAgent,
   };
   // 查询条件定义
   let query = `title~"${searchText}"`;
@@ -196,14 +222,20 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
       accessories={[
         {
           text: { value: searchResult.author },
-          icon: { source: `https://${prefs.instance}${searchResult.icon}`, mask: Image.Mask.Circle },
+          icon: {
+            source: `https://${prefs.instance}${searchResult.icon}`,
+            mask: Image.Mask.Circle,
+          },
         },
       ]}
       icon={{ source: getConfluenceIcon(searchResult) }}
       actions={
         <ActionPanel>
           <ActionPanel.Section>
-            <Action.OpenInBrowser title="Open in Browser" url={confluenceUrl + searchResult.url} />
+            <Action.OpenInBrowser
+              title="Open in Browser"
+              url={confluenceUrl + searchResult.url}
+            />
             <Action.CopyToClipboard
               title="Copy URL"
               content={confluenceUrl + searchResult.url}
