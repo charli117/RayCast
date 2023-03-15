@@ -63,6 +63,7 @@
     "@raycast/api": "^1.27.0",
     "node-fetch": "^3.0.0",
     "prettier": "^2.5.1",
+    "publish": "^0.6.0",
     "ray": "^0.0.1"
   },
   "devDependencies": {
