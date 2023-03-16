@@ -15,7 +15,6 @@ import https = require("https");
 
 const prefs: {
   instanceType: string;
-  user: string;
   instance: string;
   unsafeHttps: boolean;
   token: string;
@@ -25,16 +24,10 @@ export const confluenceUrl =
     ? `https://${prefs.instance}/wiki`
     : `https://${prefs.instance}`;
 
-const missingPrefs =
-  prefs.instanceType == "cloud" ? !prefs.user || !prefs.token : !prefs.token;
 
 const headers = {
   Accept: "application/json",
-  Authorization:
-    prefs.instanceType == "cloud"
-      ? "Basic " +
-        Buffer.from(`${prefs.user}:${prefs.token}`).toString("base64")
-      : `Bearer ${prefs.token}`,
+  Authorization: `Bearer ${prefs.token}`,
 };
 
 function renderFilter(onChange: (value: string) => void) {
@@ -67,7 +60,7 @@ function renderPreferences() {
 }
 
 export default function Command() {
-  if (missingPrefs) {
+  if (!prefs.token) {
     return renderPreferences();
   }
   const [results, isLoading, search] = useSearch();

@@ -1,46 +1,32 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "kb-search",
-  "title": "CVTE KB Search",
-  "description": "Search through CVTE KB",
-  "icon": "confluence-icon.png",
+  "name": "search-cmdb",
+  "title": "Search CMDB",
+  "description": "Search CVTE IT CMDB",
+  "icon": "command-icon.png",
   "author": "charliewei",
   "owner": "cvte",
-  "contributors": [
-    "lr1980"
+  "categories": [
+    "Developer Tools"
   ],
   "license": "MIT",
   "commands": [
     {
       "name": "index",
-      "title": "Search CVTE KB",
-      "subtitle": "kb",
-      "description": "Showing Search Results in CVTE KB",
+      "title": "Search CVTE IT CMDB",
+      "description": "Showing Search Results in CVTE IT CMDB",
       "mode": "view"
     }
   ],
   "preferences": [
     {
-      "name": "instanceType",
-      "type": "dropdown",
-      "required": true,
-      "title": "认证方式",
-      "description": "用户认证方式,内部系统仅允许单点登录",
-      "data": [
-        {
-          "value": "on-premise",
-          "title": "On-premise"
-        }
-      ]
-    },
-    {
       "name": "instance",
       "type": "textfield",
       "required": true,
       "title": "域名",
-      "description": "KB系统内网访问域名",
-      "default": "kb.cvte.com",
-      "placeholder": "KB内网访问域名"
+      "description": "CMDB系统内网访问域名",
+      "default": "itsm.cvte.com",
+      "placeholder": "CMDB内网访问域名"
     },
     {
       "name": "unsafeHttps",
@@ -56,8 +42,26 @@
       "type": "password",
       "required": true,
       "title": "个人访问令牌",
-      "description": "登录 https://kb.cvte.com/plugins/personalaccesstokens/usertokens.action 获取",
+      "description": "登录 https://itsm.cvte.com/secure/ViewProfile.jspa?selectedTab=com.atlassian.pats.pats-plugin:jira-user-personal-access-tokens 获取",
       "placeholder": "请录入个人访问令牌"
+    },
+    {
+      "name": "schemaid",
+      "type": "textfield",
+      "required": true,
+      "title": "架构ID",
+      "description": "CMDB模型架构ID号",
+      "default": "74",
+      "placeholder": "CMDB内网访问域名"
+    },
+    {
+      "name": "limit",
+      "type": "textfield",
+      "required": true,
+      "title": "返回记录数",
+      "description": "查询结果返回限制记录条数",
+      "default": "26",
+      "placeholder": "结果返回记录数"
     }
   ],
   "dependencies": {
@@ -69,13 +73,15 @@
     "ray": "^0.0.1"
   },
   "devDependencies": {
-    "@types/node": "~16.10.0",
-    "@types/react": "^17.0.28",
+    "@raycast/eslint-config": "1.0.5",
+    "@types/node": "18.8.3",
+    "@types/react": "18.0.9",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "react-devtools": "^4.19.2",
+    "prettier": "^2.5.1",
     "typescript": "^4.4.3"
   },
   "scripts": {
