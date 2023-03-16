@@ -137,9 +137,7 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
 // 查询结构处理
 async function parseResponse(response: Response) {
   const jsonResults = ((await response.json()) as ResultsItem) ?? [];
-  return jsonResults
-    .filter((jsonResult: ResultsItem) => jsonResult)
-    .map((jsonResult: ResultsItem) => {
+  return jsonResults.map((jsonResult: ResultsItem) => {
       return {
         id: jsonResult.id as number,
         key: jsonResult.objectKey as string,
@@ -203,6 +201,7 @@ interface SearchResult {
 }
 
 interface ResultsItem {
+  [x: string]: any;
   id: number;
   label: string;
   objectKey: string;
