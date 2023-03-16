@@ -5,6 +5,7 @@
   "description": "Search through Confluence",
   "icon": "confluence-icon.png",
   "author": "charliewei",
+  "owner": "cvte",
   "contributors": [
     "lr1980"
   ],
