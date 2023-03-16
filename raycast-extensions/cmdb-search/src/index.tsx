@@ -13,6 +13,7 @@ import fetch, { AbortError, RequestInit, Response } from "node-fetch";
 import { useCallback, useEffect, useRef, useState } from "react";
 import https = require("https");
 
+// 获取全局变量
 const prefs: {
   instance: string;
   unsafeHttps: boolean;
@@ -21,33 +22,34 @@ const prefs: {
   token: string;
 } = getPreferenceValues();
 export const cmdbUrl = `https://${prefs.instance}`;
-export const schemaId = `https://${prefs.schemaid}`;
-export const limit = `https://${prefs.limit}`;
-export const timestamp = `https://${prefs.limit}`;
 
+// 鉴权函数
 const headers = {
   Accept: "application/json",
   Authorization: `Bearer ${prefs.token}`,
 };
 
+// 获取时间戳
+function getNowMilliSecond() {
+  return Math.floor(Date.now());
+}
+
+// 初始化配置
 function renderPreferences() {
   const markdown = `Please set your preferences in the extension preferences.`;
-
   return (
     <Detail
       markdown={markdown}
       actions={
         <ActionPanel>
-          <Action
-            title="Open Extension Preferences"
-            onAction={openExtensionPreferences}
-          />
+          <Action title="Open Extension Preferences" onAction={openExtensionPreferences} />
         </ActionPanel>
       }
     />
   );
 }
 
+// 查询关键字获取
 export default function Command() {
   if (!prefs.token) {
     return renderPreferences();
@@ -63,9 +65,8 @@ export default function Command() {
   return (
     <List
       isLoading={isLoading}
-      searchBarPlaceholder="Search by keywords..."
+      searchBarPlaceholder="Search by name..."
       onSearchTextChange={(searchText) => setSearchText(searchText)}
-      searchBarAccessory={renderFilter(setType)}
       throttle
     >
       <List.Section title="Results">
@@ -89,20 +90,13 @@ function useSearch() {
       cancelRef.current = new AbortController();
       setIsLoading(true);
       try {
-        const response = await searchCMDB(
-          searchText,
-          cancelRef.current.signal
-        );
+        const response = await searchCMDB(searchText, cancelRef.current.signal);
         setResults(response);
       } catch (error) {
         if (error instanceof AbortError) {
           return;
         }
-        showToast(
-          Toast.Style.Failure,
-          "Could not perform search",
-          String(error)
-        );
+        showToast(Toast.Style.Failure, "Could not perform search", String(error));
       } finally {
         setIsLoading(false);
       }
@@ -111,7 +105,7 @@ function useSearch() {
   );
 
   useEffect(() => {
-    search("", "page");
+    search("");
     return () => {
       cancelRef.current?.abort();
     };
@@ -120,10 +114,7 @@ function useSearch() {
   return [results, isLoading, search] as const;
 }
 
-async function searchCMDB(
-  searchText: string,
-  signal: AbortSignal
-) {
+async function searchCMDB(searchText: string, signal: AbortSignal) {
   const httpsAgent = new https.Agent({
     rejectUnauthorized: !prefs.unsafeHttps,
   });
@@ -133,56 +124,61 @@ async function searchCMDB(
     agent: httpsAgent,
   };
 
-  // 查询条件定义及转码
+  // 查询关键字定义及转码
   let query = encodeURIComponent(`${searchText}`);
+
   // 查询结果调用
-  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${schemaId}&limit=${limit}&query=${query}&page=1&_=${timestamp}`;
-  return fetch(apiUrl, init).then((response) => {
+  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${prefs.limit}&query=${query}&page=1&_=${getNowMilliSecond()}`;
+  return fetch(apiUrl, init).then((response: any) => {
     return parseResponse(response);
   });
 }
 
+// 查询结构处理
 async function parseResponse(response: Response) {
-  // const json = (await response.json()) as APIResponse;
-  // const jsonResults = (json?.results as ResultsItem[]) ?? [];
   const jsonResults = ((await response.json()) as ResultsItem) ?? [];
   return jsonResults
-    .map((jsonResult: ResultsItem) => {
-      return {
-        id: jsonResult.id as number,
-        key: jsonResult.objectKey as string,
-        name: jsonResult.name as string,
-        type: jsonResult.objectType.name as string,
-        typeId: jsonResult.objectType.id as number,
-        url: jsonResult._links.self as string,
-        icon: jsonResult.avatar.url48 as string,
-      };
-    });
+  .filter((jsonResult: ResultsItem) => jsonResult)
+  .map((jsonResult: ResultsItem) => {
+    return {
+      id: jsonResult.id as number,
+      key: jsonResult.objectKey as string,
+      name: jsonResult.name as string,
+      type: jsonResult.objectType.name as string,
+      typeId: jsonResult.objectType.id as number,
+      url: jsonResult._links.self as string,
+      icon: jsonResult.avatar.url48 as string,
+    };
+  });
 }
 
+// 查询结果呈现
 function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
+  // console.log(`${searchResult.icon}`);
   return (
     <List.Item
+      id={searchResult.key}
       title={searchResult.name}
-      subtitle={searchResult.key}
-      keywords={[searchResult.name, searchResult.type]}
-      accessories={[
-        {
-          text: { value: searchResult.author },
-          icon: {
-            source: ${searchResult.icon},
+      subtitle={searchResult.type}
+      keywords={[searchResult.name, searchResult.key]}
+      icon={{
+            source: `${searchResult.icon}`,
             mask: Image.Mask.Circle,
-          },
-        },
-      ]}
-      icon={{ source: "list-icon.png" }}
+          }}
+      // accessories={[
+      //   {
+      //     text: { value: searchResult.author },
+      //     icon: {
+      //       source: `${searchResult.icon}`,
+      //       mask: Image.Mask.Circle,
+      //     },
+      //   },
+      // ]}
+      // icon={{ source: "list-icon.png" }}
       actions={
         <ActionPanel>
           <ActionPanel.Section>
-            <Action.OpenInBrowser
-              title="Open in Browser"
-              url={searchResult.url}
-            />
+            <Action.OpenInBrowser title="Open in Browser" url={searchResult.url} />
             <Action.CopyToClipboard
               title="Copy URL"
               content={searchResult.url}
@@ -195,27 +191,16 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
   );
 }
 
-// interface SearchResult {
-//   id: number;
-//   key: string;
-//   subtitle: string;
-//   name: string;
-//   type: string;
-//   typeId: string;
-//   url: string;
-// }
 interface SearchResult {
-  id: string;
+  id: number;
   name: string;
   type: string;
   key: string;
   url: string;
-  author: string;
   icon: string;
   subTitle: string;
   mediaType: string;
 }
-
 
 interface ResultsItem {
   id: number;
@@ -261,7 +246,7 @@ interface Objectdata {
 }
 
 interface Icondata {
-  id: string;
+  id: number;
   name: string;
   url16: string;
   url48: string;

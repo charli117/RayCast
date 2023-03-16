@@ -15,7 +15,7 @@
       "name": "index",
       "title": "Search CVTE KB",
       "subtitle": "kb",
-      "description": "Showing Search Results in CVTE KB",
+      "description": "CVTE KB知识库快速检索服务",
       "mode": "view"
     }
   ],
