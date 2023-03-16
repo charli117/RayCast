@@ -3,7 +3,7 @@
 ## [Update] - 2023-03-15
 
 - fix: 修正中文无法检索问题
-- feat: CVTE KB环境个性化适配
+- feat: CVTE KB 环境个性化适配
 
 ## [Update] - 2023-02-09
 

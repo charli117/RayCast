@@ -71,9 +71,7 @@ export default function Command() {
     >
       <List.Section title="Results">
         {results.length > 0 &&
-          results.map((searchResult) => (
-            <SearchListItem key={searchResult.name} searchResult={searchResult} />
-          ))}
+          results.map((searchResult) => <SearchListItem key={searchResult.name} searchResult={searchResult} />)}
       </List.Section>
     </List>
   );
@@ -128,7 +126,9 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
   let query = encodeURIComponent(`${searchText}`);
 
   // 查询结果调用
-  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${prefs.limit}&query=${query}&page=1&_=${getNowMilliSecond()}`;
+  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${
+    prefs.limit
+  }&query=${query}&page=1&_=${getNowMilliSecond()}`;
   return fetch(apiUrl, init).then((response: any) => {
     return parseResponse(response);
   });
@@ -138,18 +138,18 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
 async function parseResponse(response: Response) {
   const jsonResults = ((await response.json()) as ResultsItem) ?? [];
   return jsonResults
-  .filter((jsonResult: ResultsItem) => jsonResult)
-  .map((jsonResult: ResultsItem) => {
-    return {
-      id: jsonResult.id as number,
-      key: jsonResult.objectKey as string,
-      name: jsonResult.name as string,
-      type: jsonResult.objectType.name as string,
-      typeId: jsonResult.objectType.id as number,
-      url: jsonResult._links.self as string,
-      icon: jsonResult.avatar.url48 as string,
-    };
-  });
+    .filter((jsonResult: ResultsItem) => jsonResult)
+    .map((jsonResult: ResultsItem) => {
+      return {
+        id: jsonResult.id as number,
+        key: jsonResult.objectKey as string,
+        name: jsonResult.name as string,
+        type: jsonResult.objectType.name as string,
+        typeId: jsonResult.objectType.id as number,
+        url: jsonResult._links.self as string,
+        icon: jsonResult.avatar.url48 as string,
+      };
+    });
 }
 
 // 查询结果呈现
@@ -162,9 +162,9 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
       subtitle={searchResult.type}
       keywords={[searchResult.name, searchResult.key]}
       icon={{
-            source: `${searchResult.icon}`,
-            mask: Image.Mask.Circle,
-          }}
+        source: `${searchResult.icon}`,
+        mask: Image.Mask.Circle,
+      }}
       // accessories={[
       //   {
       //     text: { value: searchResult.author },

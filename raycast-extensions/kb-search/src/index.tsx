@@ -24,7 +24,6 @@ export const confluenceUrl =
     ? `https://${prefs.instance}/wiki`
     : `https://${prefs.instance}`;
 
-
 const headers = {
   Accept: "application/json",
   Authorization: `Bearer ${prefs.token}`,
