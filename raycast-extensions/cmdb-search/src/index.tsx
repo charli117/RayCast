@@ -16,7 +16,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { runAppleScript } from "run-applescript";
 import https = require("https");
 
-
 // 获取全局变量
 const prefs: {
   instance: string;
@@ -74,7 +73,8 @@ export default function Command() {
       isShowingDetail
       throttle
     >
-    {results.length > 0 && results.map((searchResult) => <SearchListItem key={searchResult.name} searchResult={searchResult} />)}
+      {results.length > 0 &&
+        results.map((searchResult) => <SearchListItem key={searchResult.name} searchResult={searchResult} />)}
     </List>
   );
 }
@@ -128,7 +128,9 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
   let query = encodeURIComponent(`${searchText}`);
 
   // 查询结果调用
-  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${prefs.limit}&query=${query}&page=1&_=${getNowMilliSecond()}`;
+  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${
+    prefs.limit
+  }&query=${query}&page=1&_=${getNowMilliSecond()}`;
   return fetch(apiUrl, init).then((response: any) => {
     return parseResponse(response);
   });
@@ -138,33 +140,33 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
 async function parseResponse(response: Response) {
   const jsonResults = ((await response.json()) as ResultsItem) ?? [];
   return jsonResults.map((jsonResult: ResultsItem) => {
-      return {
-        id: jsonResult.id as number,
-        key: jsonResult.objectKey as string,
-        name: jsonResult.name as string,
-        type: jsonResult.objectType.name as string,
-        typeId: jsonResult.objectType.id as number,
-        url: jsonResult._links.self as string,
-        icon: jsonResult.avatar.url16 as string,
-      };
-    });
+    return {
+      id: jsonResult.id as number,
+      key: jsonResult.objectKey as string,
+      name: jsonResult.name as string,
+      type: jsonResult.objectType.name as string,
+      typeId: jsonResult.objectType.id as number,
+      url: jsonResult._links.self as string,
+      icon: jsonResult.avatar.url16 as string,
+    };
+  });
 }
 
 // 查询结果呈现
-function SearchListItem({ searchResult }: { searchResult: SearchResult }) { 
+function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
   const markdown = `![Illustration](${searchResult.icon})`;
   return (
     <List.Item
       id={searchResult.key}
       title={searchResult.name}
       keywords={[searchResult.name, searchResult.key]}
-      icon={{ source: {dark: Icon.PlusCircleFilled, light: Icon.PlusCircle }}}
+      icon={{ source: { dark: Icon.PlusCircleFilled, light: Icon.PlusCircle } }}
       detail={
         <List.Item.Detail
           markdown={markdown}
           metadata={
             <List.Item.Detail.Metadata>
-            <List.Item.Detail.Metadata.Separator />
+              <List.Item.Detail.Metadata.Separator />
               <List.Item.Detail.Metadata.Label title="模型" text={searchResult.type} />
               <List.Item.Detail.Metadata.Label title="关键字" text={searchResult.key} />
               <List.Item.Detail.Metadata.Label title="标签" text={searchResult.name} />
@@ -186,7 +188,8 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
             <Action
               title="堡垒机访问"
               icon={Icon.Document}
-              onAction={() => runAppleScript(`
+              onAction={() =>
+                runAppleScript(`
                   tell application "iTerm"
                     activate
                     tell current window
@@ -196,16 +199,16 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
                             write text "ssh -L 0.0.0.0:22:@blj.gz.cvte.cn:60022 cloud@${searchResult.name}"
                         end tell
                     end tell
-                end tell`)}
+                end tell`)
+              }
               shortcut={{ modifiers: ["cmd"], key: "b" }}
             />
-            </ActionPanel.Section>          
+          </ActionPanel.Section>
         </ActionPanel>
       }
     />
   );
 }
-
 
 interface SearchResult {
   id: number;

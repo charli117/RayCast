@@ -39,8 +39,8 @@ export default async function Command() {
     console.log(`Could not copy file '${file}'. Reason: ${error}`);
   }
 
-// copy transient data
-  await Clipboard.copy("my-secret-password", { transient: true })
+  // copy transient data
+  await Clipboard.copy("my-secret-password", { transient: true });
 }
 ```
 
@@ -194,5 +194,5 @@ type Content =
 Type of options passed to `Clipboard.copy`.
 
 ```typescript
-type CopyOptions = { transient: boolean }
+type CopyOptions = { transient: boolean };
 ```
