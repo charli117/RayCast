@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "search-kb",
+  "name": "kb-search",
   "title": "Search CVTE KB",
   "description": "Search through CVTE KB",
   "icon": "confluence-icon.png",
@@ -15,7 +15,7 @@
       "name": "index",
       "title": "Search CVTE KB",
       "subtitle": "kb",
-      "icon": "./asset/readme_01.png",
+      "icon": "asset/readme_01.png",
       "description": "CVTE KB知识库快速检索服务",
       "mode": "view"
     }
