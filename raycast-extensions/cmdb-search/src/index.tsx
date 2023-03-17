@@ -13,7 +13,9 @@ import {
 import { getAvatarIcon } from "@raycast/utils";
 import fetch, { AbortError, RequestInit, Response } from "node-fetch";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { runAppleScript } from "run-applescript";
 import https = require("https");
+
 
 // 获取全局变量
 const prefs: {
@@ -22,6 +24,7 @@ const prefs: {
   schemaid: string;
   limit: number;
   token: string;
+  blj: string;
 } = getPreferenceValues();
 export const cmdbUrl = `https://${prefs.instance}`;
 
@@ -57,7 +60,6 @@ export default function Command() {
     return renderPreferences();
   }
   const [results, isLoading, search] = useSearch();
-  // const [_type, setType] = useState("page");
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
@@ -69,12 +71,10 @@ export default function Command() {
       isLoading={isLoading}
       searchBarPlaceholder="Search by name..."
       onSearchTextChange={(searchText) => setSearchText(searchText)}
+      isShowingDetail
       throttle
     >
-      <List.Section title="Results">
-        {results.length > 0 &&
-          results.map((searchResult) => <SearchListItem key={searchResult.name} searchResult={searchResult} />)}
-      </List.Section>
+    {results.length > 0 && results.map((searchResult) => <SearchListItem key={searchResult.name} searchResult={searchResult} />)}
     </List>
   );
 }
@@ -151,37 +151,55 @@ async function parseResponse(response: Response) {
 }
 
 // 查询结果呈现
-function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
-  console.log(`${searchResult.icon}`);
+function SearchListItem({ searchResult }: { searchResult: SearchResult }) { 
+  const markdown = `![Illustration](${searchResult.icon})`;
   return (
     <List.Item
       id={searchResult.key}
       title={searchResult.name}
-      subtitle={searchResult.type}
       keywords={[searchResult.name, searchResult.key]}
-      // accessories={[
-      //   {
-      //     text: { value: searchResult.author },
-      //     icon: {
-      //       source: `${searchResult.icon}`,
-      //       mask: Image.Mask.Circle,
-      //     },
-      //   },
-      // ]
+      icon={{ source: {dark: Icon.PlusCircleFilled, light: Icon.PlusCircle }}}
+      detail={
+        <List.Item.Detail
+          markdown={markdown}
+          metadata={
+            <List.Item.Detail.Metadata>
+            <List.Item.Detail.Metadata.Separator />
+              <List.Item.Detail.Metadata.Label title="模型" text={searchResult.type} />
+              <List.Item.Detail.Metadata.Label title="关键字" text={searchResult.key} />
+              <List.Item.Detail.Metadata.Label title="标签" text={searchResult.name} />
+            </List.Item.Detail.Metadata>
+          }
+        />
+      }
       // icon={{ source: `${icon_url[0]}`, fallback: Image.Mask.Circle }}
       // icon={getAvatarIcon(`${searchResult.name}`)}
-      icon={{ source: {dark: Icon.PlusCircleFilled, light: Icon.PlusCircle }}}
-      // icon={{ source: "list-icon.png" }}
       actions={
         <ActionPanel>
           <ActionPanel.Section>
-            <Action.OpenInBrowser title="Open in Browser" url={searchResult.url} />
+            <Action.OpenInBrowser title="浏览器打开" url={searchResult.url} />
             <Action.CopyToClipboard
-              title="Copy URL"
+              title="复制链接"
               content={searchResult.url}
               shortcut={{ modifiers: ["cmd"], key: "." }}
             />
-          </ActionPanel.Section>
+            <Action
+              title="堡垒机访问"
+              icon={Icon.Document}
+              onAction={() => runAppleScript(`
+                  tell application "iTerm"
+                    activate
+                    tell current window
+                        set newTab to (create tab with default profile)
+                        select
+                        tell current session of current tab
+                            write text "ssh -L 0.0.0.0:22:@blj.gz.cvte.cn:60022 cloud@${searchResult.name}"
+                        end tell
+                    end tell
+                end tell`)}
+              shortcut={{ modifiers: ["cmd"], key: "b" }}
+            />
+            </ActionPanel.Section>          
         </ActionPanel>
       }
     />
