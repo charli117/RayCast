@@ -1,19 +1,19 @@
 import {
   ActionPanel,
   Action,
-  Image,
   Detail,
   getPreferenceValues,
   List,
   Icon,
+  popToRoot,
   openExtensionPreferences,
+  closeMainWindow,
   showToast,
   Toast,
 } from "@raycast/api";
-import { getAvatarIcon } from "@raycast/utils";
-import fetch, { AbortError, RequestInit, Response } from "node-fetch";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { runAppleScript } from "run-applescript";
+import fetch, { AbortError, RequestInit, Response } from "node-fetch";
+import { SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import https = require("https");
 
 // 获取全局变量
@@ -26,6 +26,7 @@ const prefs: {
   blj: string;
 } = getPreferenceValues();
 export const cmdbUrl = `https://${prefs.instance}`;
+
 
 // 鉴权函数
 const headers = {
@@ -69,7 +70,7 @@ export default function Command() {
     <List
       isLoading={isLoading}
       searchBarPlaceholder="Search by name..."
-      onSearchTextChange={(searchText) => setSearchText(searchText)}
+      onSearchTextChange={(searchText: SetStateAction<string>) => setSearchText(searchText)}
       isShowingDetail
       throttle
     >
@@ -114,6 +115,7 @@ function useSearch() {
   return [results, isLoading, search] as const;
 }
 
+// 配置管理数据库查询接口调用
 async function searchCMDB(searchText: string, signal: AbortSignal) {
   const httpsAgent = new https.Agent({
     rejectUnauthorized: !prefs.unsafeHttps,
@@ -154,10 +156,27 @@ async function parseResponse(response: Response) {
 
 // 查询结果呈现
 function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
-  const markdown = `![Illustration](${searchResult.icon})`;
+  const markdown = `![Illustration](http://www.cvte.com/images/logo.png)`;
+  const objectkey = `${searchResult.id}_${searchResult.key}`;
+  const scriptToCreateNewTab = `
+    tell application "iTerm"
+      activate
+      repeat until application "iTerm" is running
+        delay 0.1
+      end repeat
+
+      tell current window
+          set newTab to (create tab with default profile)
+          select
+          tell current session of current tab
+              write text "ssh -L 0.0.0.0:22:@blj.gz.cvte.cn:60022 ${searchResult.name}"
+          end tell
+      end tell
+    end tell`;
   return (
     <List.Item
-      id={searchResult.key}
+      id={objectkey}
+      key={searchResult.id}
       title={searchResult.name}
       keywords={[searchResult.name, searchResult.key]}
       icon={{ source: { dark: Icon.PlusCircleFilled, light: Icon.PlusCircle } }}
@@ -174,35 +193,21 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
           }
         />
       }
-      // icon={{ source: `${icon_url[0]}`, fallback: Image.Mask.Circle }}
-      // icon={getAvatarIcon(`${searchResult.name}`)}
       actions={
         <ActionPanel>
           <ActionPanel.Section>
             <Action.OpenInBrowser title="浏览器打开" url={searchResult.url} />
+            <Action
+              title="堡垒机访问「iTerm」"
+              icon={Icon.Document}
+              onAction={() => runAppleScript(scriptToCreateNewTab)}
+              shortcut={{ modifiers: ["cmd"], key: "b" }}
+            />
             <Action.CopyToClipboard
               title="复制链接"
               content={searchResult.url}
               shortcut={{ modifiers: ["cmd"], key: "." }}
-            />
-            <Action
-              title="堡垒机访问"
-              icon={Icon.Document}
-              onAction={() =>
-                runAppleScript(`
-                  tell application "iTerm"
-                    activate
-                    tell current window
-                        set newTab to (create tab with default profile)
-                        select
-                        tell current session of current tab
-                            write text "ssh -L 0.0.0.0:22:@blj.gz.cvte.cn:60022 cloud@${searchResult.name}"
-                        end tell
-                    end tell
-                end tell`)
-              }
-              shortcut={{ modifiers: ["cmd"], key: "b" }}
-            />
+            />            
           </ActionPanel.Section>
         </ActionPanel>
       }
