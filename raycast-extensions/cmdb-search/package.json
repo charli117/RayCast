@@ -1,8 +1,8 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "search-cmdb",
-  "title": "Search CMDB",
-  "description": "Search CVTE CMDB",
+  "title": "Search CVTE CMDB",
+  "description": "Search through CVTE CMDB",
   "icon": "insight-cmdb.png",
   "author": "charliewei",
   "owner": "cvte",
@@ -66,6 +66,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.48.9",
+    "@raycast/utils": "^1.5.2",
     "build": "^0.1.4",
     "node-fetch": "^3.0.0",
     "prettier": "^2.5.1",

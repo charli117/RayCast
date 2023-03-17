@@ -5,10 +5,12 @@ import {
   Detail,
   getPreferenceValues,
   List,
+  Icon,
   openExtensionPreferences,
   showToast,
   Toast,
 } from "@raycast/api";
+import { getAvatarIcon } from "@raycast/utils";
 import fetch, { AbortError, RequestInit, Response } from "node-fetch";
 import { useCallback, useEffect, useRef, useState } from "react";
 import https = require("https");
@@ -126,9 +128,7 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
   let query = encodeURIComponent(`${searchText}`);
 
   // 查询结果调用
-  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${
-    prefs.limit
-  }&query=${query}&page=1&_=${getNowMilliSecond()}`;
+  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/search?schemaId=${prefs.schemaid}&limit=${prefs.limit}&query=${query}&page=1&_=${getNowMilliSecond()}`;
   return fetch(apiUrl, init).then((response: any) => {
     return parseResponse(response);
   });
@@ -145,24 +145,20 @@ async function parseResponse(response: Response) {
         type: jsonResult.objectType.name as string,
         typeId: jsonResult.objectType.id as number,
         url: jsonResult._links.self as string,
-        icon: jsonResult.avatar.url48 as string,
+        icon: jsonResult.avatar.url16 as string,
       };
     });
 }
 
 // 查询结果呈现
 function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
-  // console.log(`${searchResult.icon}`);
+  console.log(`${searchResult.icon}`);
   return (
     <List.Item
       id={searchResult.key}
       title={searchResult.name}
       subtitle={searchResult.type}
       keywords={[searchResult.name, searchResult.key]}
-      icon={{
-        source: `${searchResult.icon}`,
-        mask: Image.Mask.Circle,
-      }}
       // accessories={[
       //   {
       //     text: { value: searchResult.author },
@@ -171,7 +167,10 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
       //       mask: Image.Mask.Circle,
       //     },
       //   },
-      // ]}
+      // ]
+      // icon={{ source: `${icon_url[0]}`, fallback: Image.Mask.Circle }}
+      // icon={getAvatarIcon(`${searchResult.name}`)}
+      icon={{ source: {dark: Icon.PlusCircleFilled, light: Icon.PlusCircle }}}
       // icon={{ source: "list-icon.png" }}
       actions={
         <ActionPanel>
@@ -188,6 +187,7 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
     />
   );
 }
+
 
 interface SearchResult {
   id: number;
