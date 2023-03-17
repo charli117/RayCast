@@ -15,6 +15,7 @@
       "name": "index",
       "title": "Search CVTE KB",
       "subtitle": "kb",
+      "icon": "./asset/readme_01.png",
       "description": "CVTE KB知识库快速检索服务",
       "mode": "view"
     }
