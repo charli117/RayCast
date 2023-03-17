@@ -156,7 +156,7 @@ async function parseResponse(response: Response) {
 
 // 查询结果呈现
 function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
-  const markdown = `![Illustration](http://www.cvte.com/images/logo.png)`;
+  const markdown = `![Illustration](${searchResult.icon})`;
   const objectkey = `${searchResult.id}_${searchResult.key}`;
   const scriptToCreateNewTab = `
     tell application "iTerm"
