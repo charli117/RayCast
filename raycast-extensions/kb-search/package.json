@@ -47,7 +47,7 @@
       "type": "checkbox",
       "required": false,
       "title": "Unsafe HTTPS",
-      "description": "不适用HTTPS访问",
+      "description": "不使用HTTPS访问",
       "default": false,
       "label": "Enable"
     },

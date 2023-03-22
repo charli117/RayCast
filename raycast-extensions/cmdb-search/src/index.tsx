@@ -5,9 +5,7 @@ import {
   getPreferenceValues,
   List,
   Icon,
-  popToRoot,
   openExtensionPreferences,
-  closeMainWindow,
   showToast,
   Toast,
 } from "@raycast/api";
@@ -138,7 +136,60 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
   });
 }
 
-// 查询结构处理
+function useObjectSearch() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [results, setResults] = useState<APIResponse[]>([]);
+  const cancelRef = useRef<AbortController | null>(null);
+
+  const search = useCallback(
+    async function search(objectKey: string) {
+      cancelRef.current?.abort();
+      cancelRef.current = new AbortController();
+      setIsLoading(true);
+      try {
+        const response = await searchCMDBObject(objectKey, cancelRef.current.signal);
+        setResults(response);
+      } catch (error) {
+        if (error instanceof AbortError) {
+          return;
+        }
+        showToast(Toast.Style.Failure, "Could not perform search", String(error));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [cancelRef, setIsLoading, setResults]
+  );
+
+  useEffect(() => {
+    search("");
+    return () => {
+      cancelRef.current?.abort();
+    };
+  }, []);
+
+  return [results, isLoading, search] as const;
+}
+
+// 特定对象查询接口调用
+async function searchCMDBObject(objectKey: string, signal: AbortSignal) {
+  const httpsAgent = new https.Agent({
+    rejectUnauthorized: !prefs.unsafeHttps,
+  });
+  const init: RequestInit = {
+    headers,
+    method: "get",
+    agent: httpsAgent,
+  };
+
+  // 查询结果调用
+  const apiUrl = `${cmdbUrl}/rest/insight/1.0/object/${objectKey}`;
+  return fetch(apiUrl, init).then((response: any) => {
+    return parseObjectResponse(response);
+  });
+}
+
+// 全局查询结构处理
 async function parseResponse(response: Response) {
   const jsonResults = ((await response.json()) as ResultsItem) ?? [];
   return jsonResults.map((jsonResult: ResultsItem) => {
@@ -154,9 +205,21 @@ async function parseResponse(response: Response) {
   });
 }
 
+// 特定对象查询结构处理
+async function parseObjectResponse(response: Response) {
+  const json = (await response.json()) as APIResponse;
+  const jsonResults = (json?.attributes as Attributesdata[]) ?? [];
+  return jsonResults
+    .map((jsonResult: Attributesdata) => {
+      return {
+        attributes_name: jsonResult.objectTypeAttribute.name as string,
+        attributes_value: jsonResult.objectAttributeValues[1].value as unknown as string
+      };
+    });
+}
+
 // 查询结果呈现
 function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
-  const markdown = `![Illustration](${searchResult.icon})`;
   const objectkey = `${searchResult.id}_${searchResult.key}`;
   const scriptToCreateNewTab = `
     tell application "iTerm"
@@ -182,13 +245,13 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
       icon={{ source: { dark: Icon.PlusCircleFilled, light: Icon.PlusCircle } }}
       detail={
         <List.Item.Detail
-          markdown={markdown}
           metadata={
             <List.Item.Detail.Metadata>
-              <List.Item.Detail.Metadata.Separator />
               <List.Item.Detail.Metadata.Label title="模型" text={searchResult.type} />
-              <List.Item.Detail.Metadata.Label title="关键字" text={searchResult.key} />
-              <List.Item.Detail.Metadata.Label title="标签" text={searchResult.name} />
+              <List.Item.Detail.Metadata.Separator />
+              {results.length > 0 &&  results.map((searchResult) => <List.Item.Detail.Metadata.Label title={searchResult.name} searchResult={searchResult} />)}
+              {/* <List.Item.Detail.Metadata.Label title="关键字" text={searchResult.key} />
+              <List.Item.Detail.Metadata.Label title="标签" text={searchResult.name} /> */}
             </List.Item.Detail.Metadata>
           }
         />
@@ -275,4 +338,30 @@ interface Icondata {
   name: string;
   url16: string;
   url48: string;
+}
+
+interface Attributesdata {
+  objectTypeAttribute: Attributestype;
+  objectAttributeValues: Attributesvalue[];
+}
+
+interface Attributestype {
+  id: number;
+  name: string;
+  description: string;
+  label: boolean;
+}
+
+interface Attributesvalue {
+  value: number;
+  referencedType: boolean;
+  displayValue: string;
+  searchValue: string;
+}
+
+interface APIResponse {
+  id: number;
+  label: number;
+  objectKey: number;
+  attributes: Attributesdata[];
 }

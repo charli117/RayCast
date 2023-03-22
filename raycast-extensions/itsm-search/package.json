@@ -1,0 +1,73 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "itsm-search",
+  "title": "ITSM Search (CVTE)",
+  "description": "Search for Jira issues From CVTE ITSM Server instances.",
+  "icon": "command-icon.png",
+  "author": "charliewei",
+  "owner": "cvte",
+  "contributors": [
+    "sven",
+    "koseduhemak",
+    "ryanp"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "issue",
+      "title": "Search INC",
+      "subtitle": "ITSM Search (CVTE)",
+      "description": "Search CVTE ITSM issues by text, type and project",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "domain",
+      "type": "textfield",
+      "required": true,
+      "title": "域名",
+      "default": "itsm.cvte.com",
+      "description": "itsm访问域名"
+    },
+    {
+      "name": "token",
+      "type": "password",
+      "required": true,
+      "title": "个人访问令牌",
+      "description": "登录 https://itsm.cvte.com/secure/ViewProfile.jspa 获取Api Tokens",
+      "placeholder": "请录入个人访问令牌"
+    },
+    {
+      "name": "unsafeHTTPS",
+      "type": "checkbox",
+      "required": false,
+      "title": "Unsafe HTTPS",
+      "description": "不使用HTTPS访问",
+      "default": false,
+      "label": "Enable"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.36.0",
+    "node-fetch": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "~16.10.0",
+    "@types/react": "^17.0.28",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "react-devtools": "^4.19.2",
+    "typescript": "^4.4.3",
+    "prettier": "^2.5.1"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "fix-lint": "ray lint --fix",
+    "publish": "node publish.mjs"
+  }
+}
