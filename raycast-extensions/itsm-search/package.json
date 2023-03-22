@@ -15,7 +15,7 @@
   "commands": [
     {
       "name": "issue",
-      "title": "Search INC",
+      "title": "Search ITSM",
       "subtitle": "ITSM Search (CVTE)",
       "description": "Search CVTE ITSM issues by text, type and project",
       "mode": "view"
@@ -50,7 +50,7 @@
     {
       "name": "defaultjql",
       "type": "textfield",
-      "required": false,
+      "required": true,
       "title": "缺省查询JQL",
       "default": "assignee = currentUser() AND resolution is EMPTY",
       "description": "首次进入插件时执行的查询条件,流控检索所有有权限数据",
