@@ -9,6 +9,7 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
+import { jiraImage } from "./image";
 import { runAppleScript } from "run-applescript";
 import fetch, { AbortError, RequestInit, Response } from "node-fetch";
 import { SetStateAction, useCallback, useEffect, useRef, useState } from "react";
@@ -243,6 +244,7 @@ function SearchListItem({ searchResult }: { searchResult: SearchResult }) {
       title={searchResult.name}
       keywords={[searchResult.name, searchResult.key]}
       icon={{ source: { dark: Icon.PlusCircleFilled, light: Icon.PlusCircle } }}
+      // icon={{ source: (await jiraImage(searchResult.icon)) }}
       detail={
         <List.Item.Detail
           metadata={

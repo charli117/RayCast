@@ -12,7 +12,6 @@ interface ImageSpec {
 
 const imageDir = path.join(environment.supportPath, "image");
 
-
 async function isFile(path: string): Promise<boolean> {
   try {
     const stat = await fs.stat(path);
@@ -62,14 +61,6 @@ function parseImageUrl(url: string): ImageSpec {
       spec: (g) => ({
         urlPath: `secure/viewavatar?size=xsmall&avatarId=${g.key}&avatarType=issuetype`,
         imageType: 'png',
-        key: g.key,
-      }),
-    },
-    {
-      pattern: /.*\/rest\/insight\/1.0\/objecttype\/(?<key>[0-9.]+)\/icon.(?<imageType>[a-z]+)/i,
-      spec: (g) => ({
-        urlPath: `rest/insight/1.0/objecttype/${g.key}/icon.${g.imageType}?size=16`,
-        imageType: g.imageType,
         key: g.key,
       }),
     },
