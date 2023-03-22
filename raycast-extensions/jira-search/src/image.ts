@@ -57,10 +57,14 @@ function parseImageUrl(url: string): ImageSpec {
       }),
     },
   ];
+  console.debug(matcher);
   const imgSpec = matcher
     .map((m) => ({ matcher: m, match: url.match(m.pattern) }))
     .map((m) => (m.match && m.match.groups ? m.matcher.spec(m.match.groups) : undefined))
     .find((imgSpec) => imgSpec !== undefined);
+  console.debug('----------');
+  console.debug(imgSpec);
+  console.debug(url);
   if (!imgSpec) throw new Warning(`Unexpected icon path ${url}`);
   return imgSpec;
 }
