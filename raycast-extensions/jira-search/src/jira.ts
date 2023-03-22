@@ -3,8 +3,9 @@ import fetch, { FetchError, Response } from "node-fetch";
 import { ErrorText, PresentableError } from "./exception";
 import * as https from "https";
 
-const prefs: { domain: string; token: string; unsafeHTTPS: boolean } = getPreferenceValues();
+const prefs: { domain: string; token: string; unsafeHTTPS: boolean; defaultjql: string } = getPreferenceValues();
 export const jiraUrl = `https://${prefs.domain}`;
+export const defaultJQL = prefs.defaultjql;
 
 const headers = {
   Accept: "application/json",

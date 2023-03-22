@@ -1,4 +1,4 @@
-import { jiraFetchObject, jiraUrl } from "./jira";
+import { jiraFetchObject, jiraUrl, defaultJQL } from "./jira";
 import { jiraImage } from "./image";
 import { ResultItem, SearchCommand } from "./command";
 import { Color, Icon, Image } from "@raycast/api";
@@ -103,7 +103,12 @@ function buildJql(query: string): string {
   ];
 
   const jql = jqlConditions.filter((condition) => condition !== undefined).join(" AND ");
-  return jql + " order by lastViewed desc";
+  if(jql) {
+    var cusjql = `${jql}  order by lastViewed desc`;
+  } else {
+    var cusjql = `${defaultJQL} order by lastViewed desc`;
+  }
+  return cusjql;
 }
 
 function jqlFor(query: string): string {

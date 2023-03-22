@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "jira-search",
-  "title": "Jira Search (CVTE)",
+  "title": "Search CVTE Jira",
   "description": "Search for Jira issues From CVTE Jira Server instances.",
   "icon": "command-icon.png",
   "author": "charliewei",
@@ -60,6 +60,15 @@
       "description": "不使用HTTPS访问",
       "default": false,
       "label": "Enable"
+    },
+    {
+      "name": "defaultjql",
+      "type": "textfield",
+      "required": false,
+      "title": "缺省查询JQL",
+      "default": "assignee = currentUser() AND resolution is EMPTY",
+      "description": "首次进入插件时执行的查询条件,流控检索所有有权限数据",
+      "placeholder": "缺省查询条件"
     }
   ],
   "dependencies": {
