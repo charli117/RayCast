@@ -1,4 +1,4 @@
-import { jiraFetchObject, jiraUrl } from "./jira";
+import { jiraFetchObject, jiraUrl, defaultJQL } from "./jira";
 import { jiraImage } from "./image";
 import { ResultItem, SearchCommand } from "./command";
 import { Color, Icon, Image } from "@raycast/api";
@@ -61,7 +61,7 @@ function isIssueKey(query: string): boolean {
   return query.match(issueKeyPattern) !== null;
 }
 
-// 拼接JQL
+// 拼接构建JQL
 function buildJql(query: string): string {
   const spaceAndInvalidChars = /[ "]/;
 
@@ -104,7 +104,12 @@ function buildJql(query: string): string {
   ];
 
   const jql = jqlConditions.filter((condition) => condition !== undefined).join(" AND ");
-  return jql + " order by lastViewed desc";
+  if(jql) {
+    var cusjql = `${jql}  order by lastViewed desc`;
+  } else {
+    var cusjql = `${defaultJQL} order by lastViewed desc`;
+  }
+  return cusjql;
 }
 
 function jqlFor(query: string): string {
@@ -114,7 +119,6 @@ function jqlFor(query: string): string {
 // 事件查询接口调用
 export async function searchIssues(query: string): Promise<ResultItem[]> {
   const jql = jqlFor(query);
-  console.debug(jql);
   const result = await jiraFetchObject<Issues>(
     "/rest/api/2/search",
     { jql, fields },
