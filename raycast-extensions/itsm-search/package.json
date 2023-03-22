@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "itsm-search",
-  "title": "ITSM Search (CVTE)",
+  "title": "Search CVTE ITSM",
   "description": "Search for Jira issues From CVTE ITSM Server instances.",
   "icon": "command-icon.png",
   "author": "charliewei",
