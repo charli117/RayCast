@@ -137,6 +137,7 @@ async function searchCMDB(searchText: string, signal: AbortSignal) {
   });
 }
 
+
 function useObjectSearch() {
   const [isLoading, setIsLoading] = useState(true);
   const [results, setResults] = useState<APIResponse[]>([]);

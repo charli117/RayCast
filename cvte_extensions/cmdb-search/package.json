@@ -20,7 +20,7 @@
   ],
   "preferences": [
     {
-      "name": "instance",
+      "name": "domain",
       "type": "textfield",
       "required": true,
       "title": "域名",

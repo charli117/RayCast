@@ -58,12 +58,23 @@
       "title": "个人访问令牌",
       "description": "登录 https://kb.cvte.com/plugins/personalaccesstokens/usertokens.action 获取",
       "placeholder": "请录入个人访问令牌"
+    },
+    {
+      "name": "maxRecord",
+      "type": "textfield",
+      "required": true,
+      "title": "最大记录数",
+      "description": "查询结果最大返回记录数",
+      "default": "25",
+      "label": "请录入查询结果最大返回记录数"
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.48.9",
     "build": "^0.1.4",
+    "manifest": "^0.1.4",
     "node-fetch": "^3.0.0",
+    "npx": "^3.0.0",
     "prettier": "^2.5.1",
     "publish": "^0.6.0",
     "ray": "^0.0.1"

@@ -18,6 +18,7 @@ const prefs: {
   instance: string;
   unsafeHttps: boolean;
   token: string;
+  maxRecord: number;
 } = getPreferenceValues();
 export const confluenceUrl =
   prefs.instanceType == "cloud"
@@ -152,7 +153,7 @@ async function searchConfluence(
   // url encode query
   query = encodeURIComponent(query);
   // 查询结果调用
-  const apiUrl = `${confluenceUrl}/rest/api/search?cql=${query}&expand=content.version`;
+  const apiUrl = `${confluenceUrl}/rest/api/search?cql=${query}&limit=${prefs.maxRecord}&expand=content.version`;
   return fetch(apiUrl, init).then((response) => {
     return parseResponse(response);
   });

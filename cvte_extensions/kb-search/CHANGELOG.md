@@ -1,5 +1,9 @@
 # Confluence Search Changelog
 
+## [Update] - 2023-04-17
+
+- feat: 添加最大返回记录参数限制
+
 ## [Update] - 2023-03-15
 
 - fix: 修正中文无法检索问题
